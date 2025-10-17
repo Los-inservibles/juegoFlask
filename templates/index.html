@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Juego: Adivina el Número</title>
+  <link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1> Adivina el Número (1 - 100)</h1>
+    <p>Reglas: Un solo intento por juego. Si aciertas, obtienes <strong>100 puntos</strong>; si fallas, <strong>0 puntos</strong>.</p>
+
+    <section id="start-section" class="card">
+      <h2>1) Inicia un nuevo juego</h2>
+      <button id="btnStart">Iniciar Juego</button>
+      <div id="gameInfo" class="muted"></div>
+    </section>
+
+    <section id="play-section" class="card hidden">
+      <h2>2) Haz tu intento</h2>
+      <form id="guessForm">
+        <input type="number" id="number" min="1" max="100" placeholder="Tu número (1-100)" required />
+        <button type="submit">Probar</button>
+        <button type="button" id="btnFinish" class="secondary">Terminar y Guardar</button>
+      </form>
+      <div id="result"></div>
+    </section>
+
+    <section id="status-section" class="card hidden">
+      <h2>Estado del juego</h2>
+      <ul id="statusList">
+        <li><strong>ID:</strong> <span id="sId">—</span></li>
+        <li><strong>Intentos:</strong> <span id="sAttempts">0</span></li>
+        <li><strong>Puntaje:</strong> <span id="sScore">0</span></li>
+        <li><strong>Finalizado:</strong> <span id="sFinished">—</span></li>
+      </ul>
+      <div class="actions">
+        <button id="btnRestart">Nuevo Juego</button>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    let currentGameId = null;
+
+    function setStatus(data) {
+      document.getElementById("sId").textContent = data.game_id ?? "—";
+      document.getElementById("sAttempts").textContent = data.attempts ?? 0;
+      document.getElementById("sScore").textContent = data.score ?? 0;
+      document.getElementById("sFinished").textContent = data.finished ? "Sí" : "No";
+      document.getElementById("status-section").classList.remove("hidden");
+    }
+
+    async function startGame() {
+      const res = await fetch("/start", { method: "POST" });
+      const data = await res.json();
+      if (data.ok) {
+        currentGameId = data.game_id;
+        document.getElementById("gameInfo").textContent = "Juego iniciado. ID: " + currentGameId;
+        document.getElementById("play-section").classList.remove("hidden");
+        document.getElementById("result").textContent = "";
+        document.getElementById("number").value = "";
+        enablePlay(true);
+        setStatus({game_id: currentGameId, attempts: 0, score: 0, finished: false});
+      } else {
+        alert("No se pudo iniciar el juego.");
+      }
+    }
+
+    async function sendGuess(ev) {
+      ev.preventDefault();
+      if (!currentGameId) { alert("Primero inicia un juego."); return; }
+      const num = parseInt(document.getElementById("number").value, 10);
+      const res = await fetch("/guess", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ game_id: currentGameId, number: num })
+      });
+      const data = await res.json();
+      const resultDiv = document.getElementById("result");
+      if (!data.ok) {
+        resultDiv.textContent = data.error || "Error desconocido";
+        resultDiv.className = "error";
+        return;
+      }
+      if (data.result === "correcto") {
+        resultDiv.textContent = data.message; // +100 y nuevo secreto
+        resultDiv.className = "success";
+      } else {
+        resultDiv.textContent = data.message; // 0 puntos, puedes seguir
+        resultDiv.className = "warn";
+      }
+      setStatus(data);
+      document.getElementById("number").focus();
+      document.getElementById("number").select();
+    }
+
+    async function finishGame() {
+      if (!currentGameId) { alert("Primero inicia un juego."); return; }
+      const res = await fetch("/finish", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ game_id: currentGameId })
+      });
+      const data = await res.json();
+      const resultDiv = document.getElementById("result");
+      if (!data.ok) {
+        resultDiv.textContent = data.error || "Error al guardar";
+        resultDiv.className = "error";
+        return;
+      }
+      resultDiv.textContent = `Juego guardado. Intentos: ${data.attempts}, Puntaje: ${data.score}`;
+      resultDiv.className = "success";
+      setStatus(data);
+      enablePlay(false);
+    }
+
+    function enablePlay(enabled) {
+      document.getElementById("number").disabled = !enabled;
+      document.getElementById("btnFinish").disabled = !enabled;
+    }
+
+    document.getElementById("btnStart").addEventListener("click", startGame);
+    document.getElementById("guessForm").addEventListener("submit", sendGuess);
+    document.getElementById("btnFinish").addEventListener("click", finishGame);
+    document.getElementById("btnRestart").addEventListener("click", startGame);
+  </script>
+</body>
+</html>
