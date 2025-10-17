@@ -17,6 +17,15 @@ DB_FILE = os.path.join(BASE_DIR, "db.json")
 # Juegos activos en memoria (se persisten al terminar) Autor: Emmanuel Alvarez 
 active_games = {}   # { game_id: {secret, attempts, score, created_at} }
 
+# -------------------- Utilidades de archivo -------------------- Autor: Emmanuel Alvarez
+def cargar_db():
+    try:
+        import json
+        with open(DB_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {"games": {}}
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
