@@ -12,6 +12,8 @@ app = Flask(
     static_folder=os.path.join(BASE_DIR, "static"),
 )
 
+DB_FILE = os.path.join(BASE_DIR, "db.json")
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
