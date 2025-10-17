@@ -14,6 +14,9 @@ app = Flask(
 
 DB_FILE = os.path.join(BASE_DIR, "db.json")
 
+# Juegos activos en memoria (se persisten al terminar) Autor: Emmanuel Alvarez 
+active_games = {}   # { game_id: {secret, attempts, score, created_at} }
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
