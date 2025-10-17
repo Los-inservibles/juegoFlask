@@ -24,5 +24,7 @@ def start_game():
     print(f"[DEBUG] juego {game_id} iniciando... Numero secreto: {secret}")
     return jsonify({"ok": True, "game_id": game_id})
 
+#Archivo decargado y creacion de rama
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
