@@ -26,6 +26,11 @@ def cargar_db():
     except Exception:
         return {"games": {}}
 
+def guardar_db(data):  # Autor: Emmanuel Alvarez
+    import json
+    with open(DB_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
