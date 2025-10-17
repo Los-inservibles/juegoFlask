@@ -26,5 +26,37 @@ def start_game():
 
 #Archivo decargado y creacion de rama
 
+#Oscar Funcion de terminar el juego
+
+@app.route("/finish", methods=["POST"])
+def finish_game():
+    """Finaliza el juego y lo guarda en db.json."""
+    data = request.get_json(silent=True) or {}
+    game_id = data.get("game_id")
+    game = active_games.pop(game_id, None)
+
+    if not game:
+        return jsonify({"ok": False, "error": "ID de juego no válido o ya finalizado."}), 404
+
+    db = cargar_db()
+    db.setdefault("games", {})
+    db["games"][game_id] = {
+        "attempts": game["attempts"],
+        "score": game["score"],
+        "created_at": game["created_at"],
+        "finished_at": datetime.utcnow().isoformat() + "Z",
+    }
+    guardar_db(db)
+    print(f"[DEBUG] Juego {game_id} guardado en db.json -> {db['games'][game_id]}")
+    return jsonify({
+        "ok": True,
+        "message": "Juego guardado correctamente.",
+        "game_id": game_id,
+        "attempts": game["attempts"],
+        "score": game["score"],
+        "finished": True
+    })
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
