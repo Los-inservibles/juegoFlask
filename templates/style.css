@@ -142,4 +142,37 @@ button:not(:disabled):hover{ transform: translateY(-2px); }
 /* Clases utilitarias que usa tu JS */
 .hidden{ display: none !important; }
 .muted{ color: var(--muted); font-size:0.95rem; margin-top:10px; }
+/* Focus accesible */
+input:focus, button:focus{
+  outline: 3px solid rgba(96,165,250,0.12);
+  outline-offset: 2px;
+}
+
+/* Pequeñas animaciones */
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.card { animation: floatIn 300ms var(--transition); }
+
+/* Ajustes móviles */
+@media(max-width:859px){
+  .container{ padding: 20px; }
+  form{ flex-direction: column; align-items: stretch; }
+  input[type="number"]{ width: 100%; }
+  button{ width: 100%; }
+  button.secondary{ width: auto; align-self: flex-end; }
+}
+
+/* Pequeño badge para el ID en gameInfo */
+#gameInfo{
+  margin-top:10px;
+  display:inline-block;
+  padding:6px 10px;
+  border-radius:8px;
+  background: rgba(255,255,255,0.02);
+  color: var(--muted);
+  border: 1px solid rgba(255,255,255,0.02);
+  font-size:0.92rem;
+}
 
