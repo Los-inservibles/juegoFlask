@@ -4,6 +4,14 @@ import string
 from datetime import datetime
 from flask import Flask, jsonify, request, render_template
 
+# Rutas absolutas para evitar problemas de ubicaciones Autor: Emmanuel Alvarez
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static"),
+)
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
