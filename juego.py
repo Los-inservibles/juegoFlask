@@ -61,6 +61,8 @@ def finish_game():
 @app.route('/games', methods=['GET'])
 def get_all_devices():
     data = cargar_db()
+    return jsonify(data["games"])
+
 
 
 if __name__ == "__main__":
