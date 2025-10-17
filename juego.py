@@ -57,6 +57,11 @@ def finish_game():
         "finished": True
     })
 
+#Oscar Funcion para mostrar los juegos guardados
+@app.route('/games', methods=['GET'])
+def get_all_devices():
+    data = cargar_db()
+
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
