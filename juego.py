@@ -10,7 +10,7 @@ def index():
 
 @app.route("/start", methods=["POST"])
 def start_game():
-    "nuevo juego y numero"
+    #nuevo juego y numero
     game_id = "R" + "".join(random.choices(string.ascii_uppercase + string.digits, k=5))
     secret = random.randint(1,100)
     active_games[game_id] = {
@@ -20,6 +20,9 @@ def start_game():
         "creado_en": datetime.utcnow().isoformat() + "Z",
     }
 
+    #para mostrar el numero en la consola
+    print(f"[DEBUG] juego {game_id} iniciando... Numero secreto: {secret}")
+    return jsonify({"ok": True, "game_id": game_id})
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
