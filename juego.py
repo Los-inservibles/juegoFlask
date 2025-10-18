@@ -63,6 +63,35 @@ def get_all_devices():
     data = cargar_db()
     return jsonify(data["games"])
 #funciones bryan
+@app.route("/guess", methods=["POST"])
+def guess_number():
+    """
+    Evalúa el intento actual y da pistas por distancia.
+    Rango de pistas (diferencia absoluta con el secreto):
+      1-9   -> Muy cerca
+      10-19 -> Cerca
+      20-39 -> Lejos
+      40+   -> Muy lejos
+    """
+    data = request.get_json(silent=True) or {}
+    game_id = data.get("game_id")
+    number = int(data.get("number", 0))
+
+    if number < 1 or number > 100:
+        return jsonify({"ok": False, "error": "El número debe estar entre 1 y 100."}), 400
+
+    game = active_games.get(game_id)
+    if not game:
+        return jsonify({"ok": False, "error": "ID de juego no encontrado."}), 404
+
+    game["attempts"] += 1
+    secret = game["secret"]
+    
+        # Imprime el número secreto en consola en cada intento
+    print(f"[DEBUG] Juego {game_id} | Intento: {number} | Secreto actual: {secret}")
+    
+
+   
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
