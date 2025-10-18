@@ -91,6 +91,10 @@ def get_all_devices():
     return jsonify(data["games"])
 
 
-
+# -------------------- Main -------------------- Autor: Emmanuel Alvarez
 if __name__ == "__main__":
+    # Diagnóstico útil en consola
+    print("BASE_DIR:", BASE_DIR)
+    print("Templates path:", os.path.join(BASE_DIR, "templates"))
+    print("¿Existe index.html?:", os.path.exists(os.path.join(BASE_DIR, "templates", "index.html")))
     app.run(host="0.0.0.0", port=5000, debug=True)
