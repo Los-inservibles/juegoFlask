@@ -4,6 +4,33 @@ import string
 from datetime import datetime
 from flask import Flask, jsonify, request, render_template
 
+# Rutas absolutas para evitar problemas de ubicaciones Autor: Emmanuel Alvarez
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, "templates"),
+    static_folder=os.path.join(BASE_DIR, "static"),
+)
+
+DB_FILE = os.path.join(BASE_DIR, "db.json")
+
+# Juegos activos en memoria (se persisten al terminar) Autor: Emmanuel Alvarez 
+active_games = {}   # { game_id: {secret, attempts, score, created_at} }
+
+# -------------------- Utilidades de archivo -------------------- Autor: Emmanuel Alvarez
+def cargar_db():
+    try:
+        import json
+        with open(DB_FILE, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {"games": {}}
+
+def guardar_db(data):  # Autor: Emmanuel Alvarez
+    import json
+    with open(DB_FILE, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=2, ensure_ascii=False)
+
 @app.route("/", methods=["GET"])
 def index():
     return render_template("index.html")
@@ -126,4 +153,8 @@ def guess_number():
         })
 
 if __name__ == "__main__":
+    # Diagnóstico útil en consola
+    print("BASE_DIR:", BASE_DIR)
+    print("Templates path:", os.path.join(BASE_DIR, "templates"))
+    print("¿Existe index.html?:", os.path.exists(os.path.join(BASE_DIR, "templates", "index.html")))
     app.run(host="0.0.0.0", port=5000, debug=True)
