@@ -62,8 +62,7 @@ def finish_game():
 def get_all_devices():
     data = cargar_db()
     return jsonify(data["games"])
-
-
+#funciones bryan
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
