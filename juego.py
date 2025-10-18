@@ -91,7 +91,19 @@ def guess_number():
     print(f"[DEBUG] Juego {game_id} | Intento: {number} | Secreto actual: {secret}")
     
 
+    if number == secret:
+        game["score"] += 100
+        game["secret"] = random.randint(1, 100)  # nuevo secreto para seguir jugando
+        print(f"[DEBUG] ¡Adivinó! Nuevo secreto para {game_id}: {game['secret']}")
+        return jsonify({
+            "ok": True,
+            "result": "correcto",
+            "message": "¡Correcto! +100 puntos. Se generó un nuevo número secreto.",
+            "game_id": game_id,
+            "attempts": game["attempts"],
+            "score": game["score"],
+            "finished": False
+        })
    
-
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
