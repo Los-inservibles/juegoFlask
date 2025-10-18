@@ -89,9 +89,69 @@ def finish_game():
 def get_all_devices():
     data = cargar_db()
     return jsonify(data["games"])
+#funciones bryan
+@app.route("/guess", methods=["POST"])
+def guess_number():
+    """
+    Evalúa el intento actual y da pistas por distancia.
+    Rango de pistas (diferencia absoluta con el secreto):
+      1-9   -> Muy cerca
+      10-19 -> Cerca
+      20-39 -> Lejos
+      40+   -> Muy lejos
+    """
+    data = request.get_json(silent=True) or {}
+    game_id = data.get("game_id")
+    number = int(data.get("number", 0))
 
+    if number < 1 or number > 100:
+        return jsonify({"ok": False, "error": "El número debe estar entre 1 y 100."}), 400
 
-# -------------------- Main -------------------- Autor: Emmanuel Alvarez
+    game = active_games.get(game_id)
+    if not game:
+        return jsonify({"ok": False, "error": "ID de juego no encontrado."}), 404
+
+    game["attempts"] += 1
+    secret = game["secret"]
+    
+        # Imprime el número secreto en consola en cada intento
+    print(f"[DEBUG] Juego {game_id} | Intento: {number} | Secreto actual: {secret}")
+    
+
+    if number == secret:
+        game["score"] += 100
+        game["secret"] = random.randint(1, 100)  # nuevo secreto para seguir jugando
+        print(f"[DEBUG] ¡Adivinó! Nuevo secreto para {game_id}: {game['secret']}")
+        return jsonify({
+            "ok": True,
+            "result": "correcto",
+            "message": "¡Correcto! +100 puntos. Se generó un nuevo número secreto.",
+            "game_id": game_id,
+            "attempts": game["attempts"],
+            "score": game["score"],
+            "finished": False
+        })
+    else:
+        diferencia = abs(number - secret)
+        if diferencia <= 9:
+            pista = "Muy cerca"
+        elif diferencia <= 19:
+            pista = "Cerca"
+        elif diferencia <= 39:
+            pista = "Lejos"
+        else:
+            pista = "Muy lejos"
+        print(f"[DEBUG] Juego {game_id} | Intento: {number} | Pista: {pista} | Dif: {diferencia}")
+        return jsonify({
+            "ok": True,
+            "result": "incorrecto",
+            "message": f"No es {number}. {pista}.",
+            "game_id": game_id,
+            "attempts": game["attempts"],
+            "score": game["score"],
+            "finished": False
+        })
+
 if __name__ == "__main__":
     # Diagnóstico útil en consola
     print("BASE_DIR:", BASE_DIR)
