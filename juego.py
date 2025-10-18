@@ -115,7 +115,15 @@ def guess_number():
         else:
             pista = "Muy lejos"
         print(f"[DEBUG] Juego {game_id} | Intento: {number} | Pista: {pista} | Dif: {diferencia}")
-
+        return jsonify({
+            "ok": True,
+            "result": "incorrecto",
+            "message": f"No es {number}. {pista}.",
+            "game_id": game_id,
+            "attempts": game["attempts"],
+            "score": game["score"],
+            "finished": False
+        })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
