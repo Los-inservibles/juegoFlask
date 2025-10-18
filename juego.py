@@ -104,6 +104,18 @@ def guess_number():
             "score": game["score"],
             "finished": False
         })
-   
+    else:
+        diferencia = abs(number - secret)
+        if diferencia <= 9:
+            pista = "Muy cerca"
+        elif diferencia <= 19:
+            pista = "Cerca"
+        elif diferencia <= 39:
+            pista = "Lejos"
+        else:
+            pista = "Muy lejos"
+        print(f"[DEBUG] Juego {game_id} | Intento: {number} | Pista: {pista} | Dif: {diferencia}")
+
+
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000, debug=True)
